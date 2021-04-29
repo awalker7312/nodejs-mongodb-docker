@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  nodejs-mongo-docker:
+    image: nodejs-mongo-docker
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+        - mongodb
+    links:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - data:/data/db
+  
+  mongo_seed:
+    image: mongo:latest
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+    volumes: 
+      - ./mongo-seed:/mongo-seed
+    command: 
+      /mongo-seed/seed.sh
+
+volumes:
+  data:
